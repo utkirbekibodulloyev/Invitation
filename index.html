@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Will you go out with me? 💕</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(135deg, #ffe4f0 0%, #ffd6f0 40%, #f9c8f8 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .hearts-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+    .heart-particle {
+      position: absolute;
+      bottom: -60px;
+      opacity: 0;
+      animation: floatUp linear infinite;
+      user-select: none;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.5; }
+      100% { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.72);
+      backdrop-filter: blur(18px);
+      border: 2.5px solid rgba(255,150,200,0.35);
+      border-radius: 32px;
+      padding: 48px 44px 40px;
+      max-width: 420px;
+      width: 92vw;
+      text-align: center;
+      box-shadow: 0 12px 60px rgba(240,100,160,0.18), 0 2px 8px rgba(0,0,0,0.06);
+      animation: popIn 0.6s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    h1 { font-size: 1.75rem; font-weight: 900; color: #d63384; margin-bottom: 24px; line-height: 1.25; }
+    .gif-container {
+      margin: 0 auto 28px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid #ffb3d4;
+      box-shadow: 0 0 0 6px rgba(255,179,212,0.25);
+      background: #ffe4f0;
+    }
+    .gif-container img { width: 100%; height: 100%; object-fit: cover; }
+    .buttons { display: flex; gap: 16px; justify-content: center; margin-top: 4px; position: relative; }
+    button {
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      border: none;
+      border-radius: 50px;
+      padding: 13px 34px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    #yes-btn {
+      background: linear-gradient(135deg, #ff6eb4, #d63384);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(214,51,132,0.38);
+    }
+    #yes-btn:hover { transform: scale(1.07); }
+    #no-btn { background: #f0f0f0; color: #888; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    #tease-toast {
+      margin-top: 18px;
+      min-height: 24px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #d63384;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    #tease-toast.show { opacity: 1; }
+    #yes-screen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: linear-gradient(135deg, #ffe4f0, #ffd6f0, #f9c8f8);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #yes-screen.active { display: flex; }
+    #yes-screen h2 { font-size: 2.4rem; font-weight: 900; color: #d63384; margin-bottom: 20px; }
+    #yes-screen .big-gif {
+      width: 220px; height: 220px; border-radius: 50%; overflow: hidden;
+      border: 5px solid #ffb3d4;
+    }
+    #yes-screen .big-gif img { width:100%; height:100%; object-fit:cover; }
+    #yes-screen p { margin-top: 22px; font-size: 1.2rem; font-weight: 800; color: #d63384; }
+  </style>
+</head>
+<body>
+  <div class="hearts-bg" id="hearts-bg"></div>
+  <div class="container">
+    <h1>Will you go out with me? 💕</h1>
+    <div class="gif-container">
+      <img src="https://media.tenor.com/EBV7OT7ACfwAAAAj/u-u-qua-qua-u-quaa.gif" alt="cute character">
+    </div>
+    <div class="buttons">
+      <button id="yes-btn" onclick="handleYesClick()">Yes 🥰</button>
+      <button id="no-btn" onclick="handleNoClick()">No</button>
+    </div>
+    <div id="tease-toast"></div>
+  </div>
+  <div id="yes-screen">
+    <h2>Yay!! 🎉💕</h2>
+    <div class="big-gif">
+      <img src="https://media.tenor.com/EBV7OT7ACfwAAAAj/u-u-qua-qua-u-quaa.gif" alt="celebrating">
+    </div>
+    <p>I knew you'd say yes! 🌸✨</p>
+  </div>
+  <script>
+    const emojis = ['💕','💗','🌸','✨','💖','🩷','💞','🌷'];
+    const bg = document.getElementById('hearts-bg');
+    for (let i = 0; i < 22; i++) {
+      const el = document.createElement('span');
+      el.className = 'heart-particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (0.9 + Math.random() * 1.2) + 'rem';
+      el.style.animationDuration = (6 + Math.random() * 10) + 's';
+      el.style.animationDelay = (Math.random() * 10) + 's';
+      bg.appendChild(el);
+    }
+    const noBtn = document.getElementById('no-btn');
+    const teaseMsgs = [
+      "Nope, try again 😏","Are you sure?? 🥺","Think carefully… 💭",
+      "Last chance! 👀","Wrong button!! 😤","The yes button is RIGHT there 😭",
+      "Ok fine… just kidding RUN 🏃"
+    ];
+    let noCount = 0, isFixed = false;
+    function handleNoClick() {
+      noCount++;
+      const toast = document.getElementById('tease-toast');
+      toast.textContent = teaseMsgs[Math.min(noCount - 1, teaseMsgs.length - 1)];
+      toast.classList.add('show');
+      if (!isFixed) {
+        const rect = noBtn.getBoundingClientRect();
+        noBtn.style.position = 'fixed';
+        noBtn.style.left = rect.left + 'px';
+        noBtn.style.top = rect.top + 'px';
+        noBtn.style.zIndex = '50';
+        isFixed = true;
+      }
+      const maxX = window.innerWidth - noBtn.offsetWidth - 10;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 10;
+      noBtn.style.left = Math.max(10, Math.random() * maxX) + 'px';
+      noBtn.style.top = Math.max(10, Math.random() * maxY) + 'px';
+      noBtn.style.transition = 'left 0.2s, top 0.2s';
+      const yesBtn = document.getElementById('yes-btn');
+      const cur = parseFloat(yesBtn.style.fontSize || '1.05');
+      yesBtn.style.fontSize = Math.min(cur + 0.07, 1.5) + 'rem';
+    }
+    noBtn.addEventListener('mouseover', () => {
+      if (isFixed) {
+        const maxX = window.innerWidth - noBtn.offsetWidth - 10;
+        const maxY = window.innerHeight - noBtn.offsetHeight - 10;
+        noBtn.style.left = Math.max(10, Math.random() * maxX) + 'px';
+        noBtn.style.top = Math.max(10, Math.random() * maxY) + 'px';
+      }
+    });
+    function handleYesClick() {
+      document.getElementById('yes-screen').classList.add('active');
+    }
+  </script>
+</body>
+</html>
